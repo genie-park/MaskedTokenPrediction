@@ -12,8 +12,8 @@ class MaskedModel(BertPreTrainedModel):
         self.bert = BertModel(config)
         self.cls = BertOnlyMLMHead(config)        
         # self.softmax = LogSoftmax(dim=1)
-        self.cls2 = Linear(config.vocab_size, TARGET_VOCAB_SIZE)        
-        self.relu = ReLU()
+        # self.cls2 = Linear(config.vocab_size, TARGET_VOCAB_SIZE)        
+        # self.relu = ReLU()
         self.init_weights()
         # self.vocab_mask = get_candidate_vocab_mask('./dataset/', config.vocab_size)
 
@@ -46,8 +46,8 @@ class MaskedModel(BertPreTrainedModel):
         prediction_scores = self.cls(sequence_output)
         # if self.vocab_mask is not None:             
         #     prediction_scores.view(-1, self.config.vocab_size)[:, ~self.vocab_mask] = -1e5
-        prediction_scores = self.relu(prediction_scores)
-        prediction_scores = self.cls2(prediction_scores)
+        # prediction_scores = self.relu(prediction_scores)
+        # prediction_scores = self.cls2(prediction_scores)
         outputs = (prediction_scores,) + outputs[2:]  # Add hidden states and attention if they are here
 
         if masked_lm_labels is not None:

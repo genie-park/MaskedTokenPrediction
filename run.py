@@ -76,7 +76,7 @@ if __name__ == "__main__":
     parser.add_argument('--do_eval', action='store_true')
     parser.add_argument('--n_epoch',type=int, default=4)
     parser.add_argument("--train_batch_size", type=int, default=42)
-    parser.add_argument("--eval_batch_size", type=int, default=64)
+    parser.add_argument("--eval_batch_size", type=int, default=32)
     parser.add_argument("--data_dir", type=str, default="./dataset")
     parser.add_argument('--output_dir', type=str, default='./output')
     parser.add_argument('--max_seq_length', type=int, default=256)
@@ -84,8 +84,6 @@ if __name__ == "__main__":
     # parser.add_argument('--from_checkpoint', type=str, default='./output/19-33-48-0_model.bin' )
     parser.add_argument('--from_checkpoint', type=str)
     main_args = parser.parse_args()
-    sys.stdout = open('out.train', 'w')
-    sys.stderr = open('err.train', 'w')
 
     model = MaskedModel.from_pretrained('bert-base-uncased')        
     if main_args.from_checkpoint:         

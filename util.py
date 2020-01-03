@@ -156,7 +156,7 @@ def candidate_search(scores, vocab_mask, dependency_mask):
         if candidate_token_id == 0:
             break 
         predicted.append(candidate_token_id)
-        mask = dependency_mask(candidate_token_id)
+        mask = dependency_mask[candidate_token_id]
     return predicted 
 
 def get_vocab_dependency(data_dir, vocab_size):
@@ -178,14 +178,15 @@ def get_vocab_dependency(data_dir, vocab_size):
             if dependency.get(token_id[-1]) is None:
                 dependency[token_id[-1]] = set([0])
             else:
-                dependency[token_id[-1]].add(token_id[-1])
+                dependency[token_id[-1]].add(0)
 
+    next_token_mask = {}
     for key, values in dependency.items():
         mask = np.zeros(vocab_size, dtype=bool)
         for id in values:
             mask[id] = True
-        dependency[key] = mask 
-    return first_token_mask, dependency
+        next_token_mask[key] = mask 
+    return first_token_mask, next_token_mask
 
 def get_candidate_vocab_mapping(data_dir):
     vocab = {} 

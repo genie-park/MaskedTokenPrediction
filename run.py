@@ -75,7 +75,7 @@ if __name__ == "__main__":
     parser.add_argument('--do_train', action='store_true')
     parser.add_argument('--do_eval', action='store_true')
     parser.add_argument('--n_epoch',type=int, default=4)
-    parser.add_argument("--train_batch_size", type=int, default=42)
+    parser.add_argument("--train_batch_size", type=int, default=16)
     parser.add_argument("--eval_batch_size", type=int, default=32)
     parser.add_argument("--data_dir", type=str, default="./dataset")
     parser.add_argument('--output_dir', type=str, default='./output')
@@ -85,13 +85,13 @@ if __name__ == "__main__":
     parser.add_argument('--from_checkpoint', type=str)
     main_args = parser.parse_args()
 
-    model = MaskedModel.from_pretrained('bert-base-uncased')        
+    model = MaskedModel.from_pretrained('bert-large-uncased')        
     if main_args.from_checkpoint:         
         model = torch.nn.DataParallel(model)
         model.load_state_dict(torch.load(main_args.from_checkpoint))        
     else:
         model = torch.nn.DataParallel(model)
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+    tokenizer = BertTokenizer.from_pretrained('bert-large-uncased')
 
     if main_args.do_train : 
         checkpoint = train(model, tokenizer, main_args) 

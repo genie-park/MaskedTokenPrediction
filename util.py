@@ -45,6 +45,40 @@ def encode_context(tokenizer, before_blank, after_blank, label_word, max_seq_len
     assert( len(label) == max_seq_length )
     return context , label
 
+def create_test_dateset(tokenizer, data_dir, max_seq_length, max_label_length, has_header=False):
+    cached_path = os.path.join(data_dir, '__cache_test_dataset')
+    if os.path.exists(cached_path):
+        return torch.load(cached_path)      
+
+    fp = open(os.path.join(data_dir, 'test.csv'))
+    csv_file = csv.reader(fp)
+    if has_header : 
+        header = next(csv_file)
+        print('csv file header' + str(header))
+
+    example_ids = []
+    contexts = [] 
+    labels = [] 
+
+    for item in tqdm(csv_file, desc='Create test data set '):        
+        example_id = int(item[0])
+        context = item[1]
+        label = [tokenizer.mask_token] * max_label_length
+        
+        blocks = context.split('[BLANK]')
+        before_blank = blocks[0]
+        after_blank = blocks[1]
+        context_ids, label_ids = encode_context(tokenizer, before_blank, after_blank, label, max_seq_length, max_label_length)
+        example_ids.append(example_id)  
+        labels.append(label_ids)
+        contexts.append(context_ids)     
+
+    dataset = TensorDataset( torch.tensor(example_ids, dtype=torch.long),
+        torch.tensor(contexts, dtype=torch.long),
+        torch.tensor(labels, dtype=torch.long))
+
+    torch.save(dataset, cached_path)
+    return dataset
 
 def create_evaluate_dateset(tokenizer, data_dir, max_seq_length, max_label_length, has_header=False):
     cached_path = os.path.join(data_dir, '__cache_dev_dataset')
@@ -60,7 +94,6 @@ def create_evaluate_dateset(tokenizer, data_dir, max_seq_length, max_label_lengt
     example_ids = []
     contexts = [] 
     labels = [] 
-    label_masks = [] 
 
     for item in tqdm(csv_file, desc='Create dev data set '):        
         example_id = int(item[0])

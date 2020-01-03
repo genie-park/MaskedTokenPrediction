@@ -156,7 +156,7 @@ def candidate_search(scores, vocab_mask, dependency_mask):
         if candidate_token_id == 0:
             break 
         predicted.append(candidate_token_id)
-        mask = dependency_mask(candidate_token_id)
+        mask = dependency_mask[candidate_token_id]
     return predicted 
 
 def get_vocab_dependency(data_dir, vocab_size):
@@ -166,8 +166,9 @@ def get_vocab_dependency(data_dir, vocab_size):
 
     with open(os.path.join(data_dir, 'vocab.dic'), 'r', encoding='utf8') as f:
         for line in f:
-            token_id = tokenizer.encode(line.strip(), add_special_tokens=False)
-            first_token_mask[token_id[i]] = True
+            words = line.strip().split()
+            token_id = tokenizer.encode(words[0], add_special_tokens=False)
+            first_token_mask[token_id[0]] = True
             for i in range(0, len(token_id) - 1):
                 if dependency.get(token_id[i]) is None:
                     dependency[token_id[i]] = set([token_id[i+1]])
@@ -177,14 +178,15 @@ def get_vocab_dependency(data_dir, vocab_size):
             if dependency.get(token_id[-1]) is None:
                 dependency[token_id[-1]] = set([0])
             else:
-                dependency[token_id[-1]].add(token_id[-1])
+                dependency[token_id[-1]].add(0)
 
+    next_token_mask = {}
     for key, values in dependency.items():
         mask = np.zeros(vocab_size, dtype=bool)
         for id in values:
             mask[id] = True
-        dependency[key] = mask 
-    return first_token_mask, dependency
+        next_token_mask[key] = mask 
+    return first_token_mask, next_token_mask
 
 def get_candidate_vocab_mapping(data_dir):
     vocab = {} 

@@ -1,6 +1,6 @@
 import torch
 from transformers import BertTokenizer, BertForMaskedLM
-from util import create_train_dataset, create_evaluate_dateset, save_checkpoint, get_candidate_vocab_mask, candidate_search
+from util import create_train_dataset, create_evaluate_dateset, save_checkpoint, get_vocab_dependency, candidate_search
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from torch import optim
 import argparse
@@ -40,7 +40,7 @@ def evaluate(model, tokenizer, args):
     dataset = create_evaluate_dateset(tokenizer, args.data_dir, args.max_seq_length, args.max_label_length)
     data_loader = DataLoader(dataset, sampler=SequentialSampler(dataset), batch_size=args.eval_batch_size)    
     out_f = open(os.path.join(args.output_dir, 'result.txt'), 'w', encoding='utf8')
-    candidate_mask, dependency_mask = get_candidate_vocab_mask(args.data_dir, tokenizer.vocab_size)
+    candidate_mask, dependency_mask = get_vocab_dependency(args.data_dir, tokenizer.vocab_size)
     hit = 0 
     trial = 0 
     with torch.no_grad(): 

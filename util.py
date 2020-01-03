@@ -109,7 +109,7 @@ def create_train_dataset(tokenizer, data_dir, max_seq_length, max_label_length, 
             if index < len(blocks) - 1: 
                 after_blank = blocks[index+1]
                 context_ids, label_ids = encode_context(tokenizer, before_blank, after_blank, label, max_seq_length, max_label_length)
-                f.write('%d, %s[BLANK]%s, %s' % (example_id, before_blank, after_blank, label))
+                f.write('%d, %s[BLANK]%s, %s\n' % (example_id, before_blank, after_blank, label))
                 example_ids.append(example_id)  
                 labels.append(label_ids)
                 contexts.append(context_ids)
@@ -121,7 +121,7 @@ def create_train_dataset(tokenizer, data_dir, max_seq_length, max_label_length, 
                 before_blank = ' '.join(blocks[:index])
                 after_blank = ' '.join(blocks[index+1:])
                 context_ids, label_ids = encode_context(tokenizer, before_blank, after_blank, label, max_seq_length, max_label_length)
-                f.write('%d, %s[BLANK]%s, %s' % (example_id, before_blank, after_blank, label))                
+                f.write('%d, %s[BLANK]%s, %s\n' % (example_id, before_blank, after_blank, label))                
                 example_ids.append(example_id)  
                 labels.append(label_ids)
                 contexts.append(context_ids)
@@ -166,8 +166,9 @@ def get_vocab_dependency(data_dir, vocab_size):
 
     with open(os.path.join(data_dir, 'vocab.dic'), 'r', encoding='utf8') as f:
         for line in f:
-            token_id = tokenizer.encode(line.strip(), add_special_tokens=False)
-            first_token_mask[token_id[i]] = True
+            words = line.strip().split()            
+            token_id = tokenizer.encode(words[0], add_special_tokens=False)
+            first_token_mask[token_id[0]] = True
             for i in range(0, len(token_id) - 1):
                 if dependency.get(token_id[i]) is None:
                     dependency[token_id[i]] = set([token_id[i+1]])
